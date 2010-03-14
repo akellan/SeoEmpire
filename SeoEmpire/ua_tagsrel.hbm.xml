@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="SeoEmpire.Common" assembly="SeoEmpire">
+  <class name="UaTagsRel" table="ua_art_tags_rel">
+    <id name="Id" unsaved-value="0">
+      <column name="at_id" not-null="true" />
+      <generator class="identity"/>
+    </id>
+    <property name="ArtId" column="at_artid" type="Int32" />
+    <property name="TagId" column="at_tagid" type="Int32" />
+  </class>
+</hibernate-mapping>

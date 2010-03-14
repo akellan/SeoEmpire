@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+This template was written to work with NHibernate.Test.
+Copy the template to your NHibernate.Test project folder and rename it in hibernate.cfg.xml and change it 
+for your own use before compile tests in VisualStudio.
+-->
+<!-- This is the ByteFX.Data.dll provider for MySql -->
+<hibernate-configuration  xmlns="urn:nhibernate-configuration-2.2" >
+  <session-factory name="NHibernate.Test">
+    <property name="connection.driver_class">NHibernate.Driver.MySqlDataDriver</property>
+    <property name="connection.connection_string">Database=seoempire;Data Source=127.0.0.1;User Id=root;Password=;Charset=utf8</property>
+    <property name="dialect">NHibernate.Dialect.MySQLDialect</property>
+    <property name="proxyfactory.factory_class">NHibernate.ByteCode.LinFu.ProxyFactoryFactory, NHibernate.ByteCode.LinFu</property>
+    <property name="hbm2ddl.keywords">none</property>
+    <property name="show_sql">false</property>
+    
+    <mapping resource="SeoEmpire.ru_articles.hbm.xml" assembly="SeoEmpire" />
+    <mapping resource="SeoEmpire.en_articles.hbm.xml" assembly="SeoEmpire" />
+    <mapping resource="SeoEmpire.ua_articles.hbm.xml" assembly="SeoEmpire" />
+
+    <mapping resource="SeoEmpire.ru_tags.hbm.xml" assembly="SeoEmpire" />
+    <mapping resource="SeoEmpire.en_tags.hbm.xml" assembly="SeoEmpire" />
+    <mapping resource="SeoEmpire.ua_tags.hbm.xml" assembly="SeoEmpire" />
+
+    <mapping resource="SeoEmpire.ru_tagsrel.hbm.xml" assembly="SeoEmpire" />
+    <mapping resource="SeoEmpire.en_tagsrel.hbm.xml" assembly="SeoEmpire" />
+    <mapping resource="SeoEmpire.ua_tagsrel.hbm.xml" assembly="SeoEmpire" />
+    
+    
+    
+  </session-factory>
+  
+</hibernate-configuration>

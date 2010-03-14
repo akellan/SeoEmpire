@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="SeoEmpire.Common" assembly="SeoEmpire">
+  <class name="RuTag" table="ru_tags">
+    <id name="Id" unsaved-value="0">
+      <column name="tag_id" not-null="true" />
+      <generator class="identity"/>
+    </id>
+    <property name="Name" column="tag_name" type="String" />
+  </class>
+</hibernate-mapping>

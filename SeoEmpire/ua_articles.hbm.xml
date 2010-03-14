@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" namespace="SeoEmpire.Common" assembly="SeoEmpire">
+  <class name="UaArticle" table="ua_articles">
+    <id name="Id" unsaved-value="0">
+      <column name="art_id" not-null="true" />
+      <generator class="identity"/>
+    </id>
+    <property name="Date" column="art_date" type="DateTime" />
+    <property name="Description" column="art_description" type="String" />
+    <property name="Keywords" column="art_keywords" type="String" />
+    <property name="Short" column="art_short" type="String" />
+    <property name="Full" column="art_full" type="String" />
+    <property name="Title" column="art_title" type="String" />
+    <property name="MenuId" column="art_menuid" type="Int32" />
+    <property name="Day" column="art_day" type="Int32" />
+    <property name="Month" column="art_month" type="Int32" />
+    <property name="Year" column="art_year" type="Int32" />
+  </class>
+</hibernate-mapping>
