@@ -140,9 +140,8 @@ namespace SeoEmpire
 
             parserManager.Start();*/
 
-            Crawler crawler = new Crawler(
-                new Uri("http://www.domik.net/mod/main/allnews/flats/pg0/"),
-                "http://www.domik.net",
+            /*Crawler crawler = new Crawler(
+                ,
 
                 new Regex(@"<a href=(/mod/main/allnews/flats/pg[\d]{1,5}/)>&gt;&gt;</a>",
                         RegexOptions.Compiled),
@@ -151,7 +150,7 @@ namespace SeoEmpire
                         RegexOptions.Compiled),
                         186
                 );
-            crawler.Start();
+            crawler.Start();*/
 
             PageParserManager parserManager = new PageParserManager();
 
@@ -180,11 +179,11 @@ namespace SeoEmpire
 			
             //WebClient client = new WebClient();
 
-            //client.DownloadFile(new Uri("http://www.domik.net/mod/main/news/"),"test.tmp");
+            //client.DownloadFile(new Uri(""),"test.tmp");
                        
 
             ////HtmlWeb test = new HtmlWeb();
-            ////HtmlDocument doc = test.Load("http://www.domik.net/mod/main/news/");
+            ////HtmlDocument doc = test.Load("");
 
             //HtmlDocument doc = new HtmlDocument();
 
