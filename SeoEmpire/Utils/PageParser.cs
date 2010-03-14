@@ -26,10 +26,11 @@ namespace SeoEmpire.Utils
         public Regex Description { get; set; }
         public Regex Keywords { get; set; }
 
-        private const int Count = 20;
+        private const int Count = 1;
         private Timer[] _timers;
         private PageParser[] _parsers;
 
+        
         public void Start()
         {
             _timers = new Timer[Count];
@@ -48,7 +49,7 @@ namespace SeoEmpire.Utils
                                   };
                 
                 Timer td = new Timer {Interval = 500};
-                td.Elapsed += _parsers[i].Parse;
+                td.Elapsed += _parsers[i].InvokeParse;
                 td.Start();
 
                 _timers[i] = td;
@@ -75,11 +76,26 @@ namespace SeoEmpire.Utils
 
         public int _downloadErrorCount = 0;
 
+        private object m_LockTimer = new object();
+        private object m_DbLock = new object();
+
+        public void InvokeParse(object sender, ElapsedEventArgs e)
+        {
+            if (!Monitor.TryEnter(m_LockTimer)) return;
+
+            try
+            {
+                Parse(sender, e);
+            }
+            finally
+            {
+                Monitor.Exit(m_LockTimer);
+            }
+
+        }
+
         public void Parse(object sender, ElapsedEventArgs e)
         {
-            Timer timer = (Timer) sender;
-            timer.Stop();
-
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -87,7 +103,6 @@ namespace SeoEmpire.Utils
             {
                 if (Crawler.Urls.Count <= 0)
                 {
-                    timer.Start();
                     return;
                 }
 
@@ -95,11 +110,10 @@ namespace SeoEmpire.Utils
             }
 
 
-            if(IsExist(PUri))
+            /*if(IsExist(PUri))
             {
-                timer.Start();
                 return;
-            }
+            }*/
 
             
             string content = null;
@@ -116,14 +130,14 @@ namespace SeoEmpire.Utils
                     if (buff == null || buff.Length == 0)
                         throw new Exception("Buffer is null or empty");
 
-                    content = Encoding.UTF8.GetString(buff);
+                    //content = Encoding.UTF8.GetString(buff);
+                    content = Encoding.GetEncoding(1251).GetString(buff);
                 }
                 catch { downloadErrorCount++; }    
             }
 
             if(string.IsNullOrEmpty(content))
             {
-                timer.Start();
                 return;
             }
             
@@ -154,7 +168,7 @@ namespace SeoEmpire.Utils
             if (RKeywords != null)
                 keywords = RKeywords.Match(content).Groups[1].Value;
 
-            EnArticle enArticle = new EnArticle
+            RuArticle ruArticle = new RuArticle
             {
                 Date = articleDate,
                 Title = articleTitle,
@@ -162,66 +176,69 @@ namespace SeoEmpire.Utils
                 MenuId = 1,
                 Short = String.Empty,
                 Description = description,
-                Keywords = keywords,
-                Url = PUri.OriginalString
+                Keywords = keywords
             };
 
             //Вырезаем на время перевода елементы
-            TextReplacementsContainer enContainer = TextUtils.ReplaceTags(articleText, new string[] {"embed"});
 
-            TextReplacementsContainer ruContainer = (TextReplacementsContainer)enContainer.Clone();
-            TextReplacementsContainer ukContainer = (TextReplacementsContainer)enContainer.Clone();
+            //TextReplacementsContainer enContainer = TextUtils.ReplaceTags(articleText, new string[] {"embed"});
 
-            string separator = " Wwwdeve <p> ";
-            string[] forTranslate = new[] {articleTitle, enContainer.Text, description, keywords};
+            //TextReplacementsContainer ruContainer = (TextReplacementsContainer)enContainer.Clone();
+            //TextReplacementsContainer ukContainer = (TextReplacementsContainer)enContainer.Clone();
 
-            string translateText = String.Join(separator, forTranslate);
+            //string separator = " Wwwdeve <p> ";
+            //string[] forTranslate = new[] {articleTitle, enContainer.Text, description, keywords};
 
-            string ruText = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(GoogleTranslate.Send(translateText,
-                                                                                               Language.en, Language.ru)));
+            //string translateText = String.Join(separator, forTranslate);
 
-            string uaText = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(GoogleTranslate.Send(translateText,
-                                                                                               Language.en, Language.uk)));
+            //string ruText = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(GoogleTranslate.Send(translateText,
+            //                                                                                   Language.en, Language.ru)));
 
-            string[] ruData = ruText.Split(new[] { "Wwwdeve" }, StringSplitOptions.RemoveEmptyEntries);
-            string[] uaData = uaText.Split(new[] { "Wwwdeve" }, StringSplitOptions.RemoveEmptyEntries);
+            //string uaText = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(GoogleTranslate.Send(translateText,
+            //                                                                                   Language.en, Language.uk)));
 
-            ruContainer.Text = ruData[1];
+            //string[] ruData = ruText.Split(new[] { "Wwwdeve" }, StringSplitOptions.RemoveEmptyEntries);
+            //string[] uaData = uaText.Split(new[] { "Wwwdeve" }, StringSplitOptions.RemoveEmptyEntries);
 
-            RuArticle ruArticle = new RuArticle
-            {
-                Date = articleDate,
-                Title = ruData[0] ,
-                Full = TextUtils.UndoReplaceTags(ruContainer) ,
-                MenuId = 1,
-                Short = String.Empty,
-                Description = ruData[2],
-                Keywords = ruData[3]
-            };
+            //ruContainer.Text = ruData[1];
 
-            ukContainer.Text = uaData[1];
+            //RuArticle enArticle = new RuArticle
+            //{
+            //    Date = articleDate,
+            //    Title = ruData[0] ,
+            //    Full = TextUtils.UndoReplaceTags(ruContainer) ,
+            //    MenuId = 1,
+            //    Short = String.Empty,
+            //    Description = ruData[2],
+            //    Keywords = ruData[3]
+            //};
 
-            UaArticle uaArticle = new UaArticle
-            {
-                Date = articleDate,
-                Title = uaData[0],
-                Full = TextUtils.UndoReplaceTags(ukContainer),
-                MenuId = 1,
-                Short = String.Empty,
-                Description = uaData[2],
-                Keywords = uaData[3]
-            };
+            //ukContainer.Text = uaData[1];
+
+            //UaArticle uaArticle = new UaArticle
+            //{
+            //    Date = articleDate,
+            //    Title = uaData[0],
+            //    Full = TextUtils.UndoReplaceTags(ukContainer),
+            //    MenuId = 1,
+            //    Short = String.Empty,
+            //    Description = uaData[2],
+            //    Keywords = uaData[3]
+            //};
 
             
 
-            Save(enArticle);
-            Save(ruArticle);
-            Save(uaArticle);
+            //Save(enArticle);
+            lock (m_DbLock)
+            {
+                Save(ruArticle);
+            }
+            //Save(uaArticle);
 
             sw.Stop();
 
-            Console.WriteLine("PageParser:new Article Title:{0} Text:{1} Time:{2}",
-                enArticle.Title.Length, enArticle.Full.Length, sw.Elapsed.TotalSeconds);
+            //Console.WriteLine("PageParser:new Article Title:{0} Text:{1} Time:{2}",
+                //enArticle.Title.Length, enArticle.Full.Length, sw.Elapsed.TotalSeconds);
 
             sw.Start();
 
@@ -230,7 +247,7 @@ namespace SeoEmpire.Utils
                 try
                 {
                     GetImage(new Uri(mImage.Groups[1].Value)
-                    , String.Format("{0}/{1}", SavePath, enArticle.Id));    
+                    , String.Format("{0}/{1}", SavePath, ruArticle.Id));    
                 }
                 catch (Exception ex)
                 {
@@ -240,8 +257,6 @@ namespace SeoEmpire.Utils
             
             sw.Stop();
             Console.WriteLine("WithImages Time:{0}", sw.Elapsed.TotalSeconds);
-
-            timer.Start();
         }
 
         private bool IsExist(Uri uri)

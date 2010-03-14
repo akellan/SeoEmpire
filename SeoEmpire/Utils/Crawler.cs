@@ -116,7 +116,7 @@ namespace SeoEmpire.Utils
 
 
             if (_curIterator >= _maxIterator)
-                return;
+                _timer.Stop();
         }
 
         public void Start()
