@@ -141,28 +141,20 @@ namespace SeoEmpire
             parserManager.Start();*/
 			
 			
-            WebClient client = new WebClient();
+            //WebClient client = new WebClient();
 
-            client.DownloadFile(new Uri("http://www.domik.net/mod/main/news/"),"test.tmp");
-
-            
-
-            //HtmlWeb test = new HtmlWeb();
-            //HtmlDocument doc = test.Load("http://www.domik.net/mod/main/news/");
-
-            HtmlDocument doc = new HtmlDocument();
-
-            doc.Load("test.tmp", Encoding.GetEncoding(1251));
-
+            //client.DownloadFile(new Uri("http://www.domik.net/mod/main/news/"),"test.tmp");
                        
 
+            ////HtmlWeb test = new HtmlWeb();
+            ////HtmlDocument doc = test.Load("http://www.domik.net/mod/main/news/");
 
+            //HtmlDocument doc = new HtmlDocument();
 
-            //test
-
+            //doc.Load("test.tmp", Encoding.GetEncoding(1251));
 
 						
-			HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//title");
+            //HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//title");
 
             Console.WriteLine("End ...");
 
