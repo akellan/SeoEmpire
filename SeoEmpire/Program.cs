@@ -155,13 +155,14 @@ namespace SeoEmpire
             doc.Load("test.tmp", Encoding.GetEncoding(1251));
 
                        
+
+
+
+            //test
+
+
 						
 			HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//title");
-			
-			
-			
-			
-			
 
             Console.WriteLine("End ...");
 
