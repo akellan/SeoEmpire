@@ -139,7 +139,44 @@ namespace SeoEmpire
                     RegexOptions.Compiled);
 
             parserManager.Start();*/
-			
+
+            Crawler crawler = new Crawler(
+                new Uri("http://www.domik.net/mod/main/allnews/flats/pg0/"),
+                "http://www.domik.net",
+
+                new Regex(@"<a href=(/mod/main/allnews/flats/pg[\d]{1,5}/)>&gt;&gt;</a>",
+                        RegexOptions.Compiled),
+
+                new Regex(@"<h3><a alt='[^']+?' href=""([^""]+?)"">",
+                        RegexOptions.Compiled),
+                        186
+                );
+            crawler.Start();
+
+            PageParserManager parserManager = new PageParserManager();
+
+            parserManager.Title =
+                new Regex(@"<title>([\s\S]+?)</title>",
+                        RegexOptions.Compiled);
+
+            parserManager.Text =
+                new Regex(@"</h3>([\s\S]+?)<div class=""clear_line_top"">",
+                        RegexOptions.Compiled);
+
+            parserManager.Images =
+                new Regex(@"<div class=""news"">[\S\s]+?<img[\s\S]+?src=""([^""]+?)""",
+                    RegexOptions.Compiled);
+
+            parserManager.Description = new Regex(@"<meta name=description content=""([^""]+?)""",
+                    RegexOptions.Compiled);
+
+            parserManager.Keywords = new Regex(@"<meta name=keywords content=""([^""]+?)""",
+                    RegexOptions.Compiled);
+
+            parserManager.Date = new Regex(@"<div class=""descr_left fl"">([\d]{2}.[\d]{2}.[\d]{4})",
+                    RegexOptions.Compiled);
+
+            parserManager.Start();
 			
             //WebClient client = new WebClient();
 

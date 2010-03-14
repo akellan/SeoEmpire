@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Net;
 using System.Timers;
+using System.Threading;
+using Timer = System.Timers.Timer;
 
 namespace SeoEmpire.Utils
 {
@@ -22,6 +24,7 @@ namespace SeoEmpire.Utils
 
         private static readonly Queue<Uri> QUrls = new Queue<Uri>();
         public static readonly object _qLock = new object();
+        public static readonly object _qTimerLock = new object();
 
         public static Queue<Uri> Urls
         {
@@ -37,39 +40,46 @@ namespace SeoEmpire.Utils
             _rLinks = links;
             _curPage = firstPage;
             _baseAddress = baseAddress;
-            
-            _timer.Elapsed += WorkerDoWork;
-            
+
+            _timer.Elapsed += InvokeDoWork;
+
             _timer.Interval = 2500;
             _maxIterator = maxItertaor;
         }
 
+        void InvokeDoWork(object sender, ElapsedEventArgs e)
+        {
+            bool test = Monitor.TryEnter(_qTimerLock);
+
+            Console.WriteLine(test);
+
+            if (!test) return;
+
+            WorkerDoWork(sender, e);
+
+            Monitor.Exit(_qTimerLock);
+        }
+
         void WorkerDoWork(object sender, ElapsedEventArgs e)
         {
-            _timer.Stop();
             WebClient client = new WebClient();
             string content;
 
             try
             {
-                 content = client.DownloadString(_curPage);
+                content = client.DownloadString(_curPage);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Crawler: DownloadString - " + ex.Message);
 
                 _dwonloadErrorCount--;
-                if (_dwonloadErrorCount <= 0)
-                {
-                    return;
-                }
 
-                _timer.Start();
                 return;
             }
 
             _dwonloadErrorCount = 3;
-            
+
 
             Match nextPageMatch = _rNextPage.Match(content);
             if (nextPageMatch != null)
@@ -81,9 +91,8 @@ namespace SeoEmpire.Utils
                 catch (Exception ex)
                 {
                     Console.WriteLine("Crawler: GetNextPage - {0}" + ex.Message);
-                    _timer.Stop();
                 }
-                
+
             }
 
             Console.WriteLine("Crawler: CurPage - {0}", _curPage.OriginalString);
@@ -93,20 +102,21 @@ namespace SeoEmpire.Utils
             {
                 foreach (Match match in linksMatches)
                 {
-                    QUrls.Enqueue(new Uri(match.Groups[1].Value));
+                    QUrls.Enqueue(new Uri(
+                        String.IsNullOrEmpty(_baseAddress)
+                        ? match.Groups[1].Value
+                        : _baseAddress + match.Groups[1].Value));
                     Console.WriteLine("Crawler: AddLink - {0}", match.Groups[1].Value);
                 }
 
-                Console.WriteLine("Crawler: QueueCount: {0} Iterator:{1}",QUrls.Count, _curIterator);
+                Console.WriteLine("Crawler: QueueCount: {0} Iterator:{1}", QUrls.Count, _curIterator);
             }
 
             _curIterator++;
 
 
-            if(_curIterator >= _maxIterator)
+            if (_curIterator >= _maxIterator)
                 return;
-
-            _timer.Start();
         }
 
         public void Start()
