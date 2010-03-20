@@ -26,7 +26,7 @@ namespace SeoEmpire.Utils
         public Regex Description { get; set; }
         public Regex Keywords { get; set; }
 
-        private const int Count = 1;
+        private const int Count = 20;
         private Timer[] _timers;
         private PageParser[] _parsers;
 
@@ -274,16 +274,19 @@ namespace SeoEmpire.Utils
         public void Save(object article)
         {
             ISession session = DbDomain.CurrentSession;
-            try
+            using(ITransaction tr = session.BeginTransaction())
             {
-                session.Save(article);
+                try
+                {
+                    session.Save(article);
+                }
+                catch (Exception ex)
+                {
+                    tr.Rollback();
+                    Console.WriteLine("PageParser: MySql-{0}", ex.InnerException.Message);
+                }
+                tr.Commit();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("PageParser: MySql-{0}", ex.InnerException.Message);
-            }
-            
-            session.Flush();
         }
 
         public void GetImage(Uri path, string savePath)

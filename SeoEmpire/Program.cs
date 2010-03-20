@@ -19,6 +19,7 @@ namespace SeoEmpire
     {
         static void Main(string[] args)
         {
+            ServicePointManager.DefaultConnectionLimit = 30;
             /*
             DbDomain.InitSqLite();
 
@@ -140,9 +141,10 @@ namespace SeoEmpire
 
             parserManager.Start();*/
 
-            /*Crawler crawler = new Crawler(
+            Crawler crawler = new Crawler(
+                new Uri("http://www.ddsfomidsfdk.net/mod/main/allnews/flats/")
                 ,
-
+                "http://www.ddsfomidsfdfk.net",
                 new Regex(@"<a href=(/mod/main/allnews/flats/pg[\d]{1,5}/)>&gt;&gt;</a>",
                         RegexOptions.Compiled),
 
@@ -150,12 +152,12 @@ namespace SeoEmpire
                         RegexOptions.Compiled),
                         186
                 );
-            crawler.Start();*/
+            crawler.Start();
 
             PageParserManager parserManager = new PageParserManager();
 
             parserManager.Title =
-                new Regex(@"<title>([\s\S]+?)</title>",
+                new Regex(@"<title>([\s\S]+?)</title>", 
                         RegexOptions.Compiled);
 
             parserManager.Text =
