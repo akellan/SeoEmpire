@@ -77,8 +77,7 @@ namespace SeoEmpire.Utils
         public int _downloadErrorCount = 0;
 
         private object m_LockTimer = new object();
-        private object m_DbLock = new object();
-
+        
         public void InvokeParse(object sender, ElapsedEventArgs e)
         {
             if (!Monitor.TryEnter(m_LockTimer)) return;
@@ -229,10 +228,7 @@ namespace SeoEmpire.Utils
             
 
             //Save(enArticle);
-            lock (m_DbLock)
-            {
-                Save(ruArticle);
-            }
+            Save(ruArticle);
             //Save(uaArticle);
 
             sw.Stop();
